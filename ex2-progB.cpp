@@ -16,7 +16,7 @@ int main() {
     for (int i = 0; i < 3; i++) {
         threads[i] = CreateThread(
             NULL,           // NULL indica que os atributos padrão de segurança são aplicados à thread
-            0,              // Define o tamanho da pilha como padrão do sistema
+            0,              // Define o tamanho da pilha como padrão do sistema 
             threadFunc,     // Função a ser executada pela thread
             NULL,           // Argumento passado para a função threadFunc, que não é necessário neste caso
             0,              // Flags de criação, onde 0 indica que a thread começa a ser executada imediatamente
