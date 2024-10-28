@@ -1,49 +1,50 @@
-#include <stdio.h>
-#include <windows.h>
+#include <stdio.h>    // Inclui fun√ß√µes b√°sicas de entrada e sa√≠da
+#include <windows.h>  // Inclui fun√ß√µes espec√≠ficas para a manipula√ß√£o de threads no Windows
 
+/* Fun√ß√£o que ser√° executada por cada thread */
 DWORD WINAPI threadFunc(void* data) {
-    // Simula a funÁ„o do processo filho imprimindo o PID
-    printf("Processo criado. PID: %lu\n", GetCurrentThreadId());
+    // Simula a fun√ß√£o do processo filho imprimindo o PID da thread atual
+    printf("Processo criado. PID: %lu\n", GetCurrentThreadId()); // GetCurrentThreadId() obt√©m o ID da thread atual, que simula o PID de um processo no Windows
     return 0;
 }
 
 int main() {
-    HANDLE threads[3];
+    /* Declara√ß√£o de um array de handles para threads */
+    HANDLE threads[3]; // Array para armazenar os handles das tr√™s threads que ser√£o criadas, simulando processos filhos
 
-    // Cria trÍs threads (simulando chamadas para fork)
+    /* Cria√ß√£o de tr√™s threads (simulando tr√™s processos filhos) */
     for (int i = 0; i < 3; i++) {
         threads[i] = CreateThread(
-            NULL,           // Atributos padr„o de seguranÁa
-            0,              // Tamanho da pilha padr„o
-            threadFunc,     // FunÁ„o a ser executada
-            NULL,           // Argumento passado para a funÁ„o
-            0,              // Flags de criaÁ„o
-            NULL);          // ID da thread
+            NULL,           // NULL indica que os atributos padr√£o de seguran√ßa s√£o aplicados √† thread
+            0,              // Define o tamanho da pilha como padr√£o do sistema
+            threadFunc,     // Fun√ß√£o a ser executada pela thread
+            NULL,           // Argumento passado para a fun√ß√£o threadFunc, que n√£o √© necess√°rio neste caso
+            0,              // Flags de cria√ß√£o, onde 0 indica que a thread come√ßa a ser executada imediatamente
+            NULL);          // ID da thread, que n√£o precisa ser armazenado explicitamente
 
         if (threads[i] == NULL) {
+            // Caso CreateThread falhe, imprime mensagem de erro e encerra o programa
             fprintf(stderr, "Falha ao criar a thread.\n");
             return 1;
         }
     }
 
-    // Aguarda todas as threads terminarem
+    /* Espera todas as threads terminarem sua execu√ß√£o */
+    // WaitForMultipleObjects aguarda que todas as threads terminem antes de prosseguir
+    // O primeiro par√¢metro (3) indica o n√∫mero de threads a serem aguardadas
+    // O segundo par√¢metro √© o array de handles para as threads
+    // O terceiro par√¢metro (TRUE) indica que queremos aguardar todas as threads simultaneamente
+    // O √∫ltimo par√¢metro (INFINITE) faz com que o programa espere indefinidamente at√© que todas as threads terminem
     WaitForMultipleObjects(3, threads, TRUE, INFINITE);
 
-    // Fecha os handles das threads
+    /* Libera recursos do sistema fechando os handles das threads */
     for (int i = 0; i < 3; i++) {
-        CloseHandle(threads[i]);
+        CloseHandle(threads[i]); // Fecha o handle de cada thread, liberando recursos alocados para cada uma delas
     }
 
-    return 0;
+    return 0; // Retorna 0 para indicar que o programa terminou com sucesso
 }
 
+/* Portanto, a resposta √† pergunta "Programa 2 (figura 3.31, p√°g. 186): Quantos processos s√£o criados?" √© 4 unidades de execu√ß√£o, sendo um processo pai e tr√™s threads. Isso foi confirmado pela sa√≠da do c√≥digo adaptado para Windows, onde as threads s√£o usadas para simular as chamadas `fork()` de Unix, criando novas linhas de execu√ß√£o dentro do mesmo processo pai, e n√£o processos independentes.
 
-/* Portanto, a resposta ‡ pergunta "Programa 2 (figura 3.31, p·g. 186): Quantos processos s„o criados?
-" È 4 unidades de execuÁ„o, sendo um processo pai e trÍs threads. Isso foi confirmado pela saÌda do cÛdigo
- adaptado para Windows, onde as threads s„o usadas para simular as chamadas `fork()` de Unix, criando novas 
- linhas de execuÁ„o dentro do mesmo processo pai, e n„o processos independentes.
-
-Assim, cada thread executa a funÁ„o `threadFunc`, onde imprime seu prÛprio PID, confirmando que n„o h· separaÁ„o de memÛria 
-entre as threads e o processo pai em ambientes Windows. Essa execuÁ„o representa um trecho de cÛdigo "simulado", onde cada thread compartilha 
-o espaÁo de memÛria do processo pai, resultando no total de quatro unidades de execuÁ„o. */
-
+Assim, cada thread executa a fun√ß√£o `threadFunc`, onde imprime seu pr√≥prio PID, confirmando que n√£o h√° separa√ß√£o de mem√≥ria entre as threads e o processo pai em ambientes Windows. Essa execu√ß√£o representa um trecho de c√≥digo "simulado", onde cada thread compartilha o espa√ßo de mem√≥ria do processo pai, resultando no total de quatro unidades de execu√ß√£o. */
